@@ -20,37 +20,134 @@
             overflow: hidden;
         }
 
-        /* --- MODE TOGGLE SWITCH (Top Center) --- */
-        .mode-switch-container {
+        /* --- THE SURPRISE TOGGLE (Top Center) --- */
+        .toggle-container {
             position: absolute;
-            top: 20px;
+            top: 25px;
             left: 50%;
             transform: translateX(-50%);
             z-index: 1000;
-            background: rgba(255,255,255,0.9);
-            padding: 5px;
-            border-radius: 30px;
-            display: flex;
-            gap: 5px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
 
-        .mode-btn {
-            border: none;
+        /* The Switch Box */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 28px;
+        }
+
+        /* Hide default HTML checkbox */
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        /* The Slider */
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        /* Active State (FSU Garnet) */
+        input:checked + .slider {
+            background-color: #782F40;
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(22px);
+        }
+
+        /* Optional: Tiny check icon inside the toggle when active */
+        .slider:after {
+            content: '✓';
+            color: white;
+            display: block;
+            position: absolute;
+            transform: translate(-50%, -50%);
+            top: 50%;
+            left: 35%;
+            font-size: 14px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        input:checked + .slider:after {
+            opacity: 1;
+        }
+
+        /* --- BOTTOM FLOATING NAV (Minimalist) --- */
+        .bottom-nav {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 255, 255, 0.9);
+            backdrop-filter: blur(10px);
+            padding: 10px 20px;
+            border-radius: 50px;
+            display: flex;
+            gap: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            z-index: 100;
+            transition: opacity 0.3s, transform 0.3s;
+        }
+
+        /* Hide Nav when in 3D mode */
+        .bottom-nav.hidden {
+            opacity: 0;
+            transform: translateX(-50%) translateY(20px);
+            pointer-events: none;
+        }
+
+        .nav-btn {
             background: transparent;
-            padding: 10px 25px;
-            border-radius: 25px;
-            font-size: 1rem;
+            border: none;
+            color: #333;
+            font-size: 0.9rem;
             font-weight: 600;
             cursor: pointer;
-            color: #555;
-            transition: all 0.2s ease;
+            padding: 5px 15px;
+            border-radius: 20px;
+            transition: background 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
-        .mode-btn.active {
-            background-color: #782F40; /* FSU Garnet */
-            color: white;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        .nav-btn:active {
+            background-color: #eee;
+        }
+        
+        .nav-btn.reset {
+            color: #782F40; /* Highlight the reset button */
+        }
+
+        /* Separator lines */
+        .divider {
+            width: 1px;
+            background-color: #ccc;
+            height: 20px;
+            align-self: center;
         }
 
         /* --- VIEW CONTAINERS --- */
@@ -60,116 +157,38 @@
             position: absolute;
             top: 0;
             left: 0;
-            display: none; /* Hidden by default */
+            visibility: hidden; 
+            opacity: 0;
+            transition: opacity 0.4s ease-in-out;
         }
 
-        /* Show the active section */
         .view-section.active-view {
-            display: block;
+            visibility: visible;
+            opacity: 1;
         }
 
-        /* 2D Viewer Styling */
-        #openseadragon-viewer {
+        /* Viewers */
+        #openseadragon-viewer, model-viewer {
             width: 100%;
             height: 100%;
-            background-color: #111;
         }
-
-        /* 3D Viewer Styling */
-        model-viewer {
-            width: 100%;
-            height: 100%;
-            background-color: #222;
-            --poster-color: transparent;
-        }
-
-        /* --- INFO PANELS --- */
-        .info-panel {
-            position: absolute;
-            bottom: 30px;
-            left: 30px;
-            width: 360px; 
-            background: rgba(255, 255, 255, 0.95);
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            pointer-events: auto;
-        }
-
-        .info-panel h1 {
-            margin-top: 0;
-            font-size: 1.3rem;
-            color: #333;
-            border-bottom: 2px solid #782F40;
-            padding-bottom: 8px;
-            margin-bottom: 12px;
-        }
-
-        .info-panel p {
-            font-size: 0.95rem;
-            line-height: 1.4;
-            color: #555;
-            margin-bottom: 15px;
-        }
-
-        /* Buttons */
-        .controls-row {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 10px;
-            gap: 8px;
-        }
-
-        .btn {
-            background-color: #782F40;
-            color: white;
-            border: none;
-            padding: 10px;
-            border-radius: 4px;
-            font-size: 0.9rem;
-            cursor: pointer;
-            flex-grow: 1;
-        }
-
-        .btn-secondary { background-color: #555; }
-        .btn:active { opacity: 0.8; }
         
-        #page-counter {
-            text-align: center;
-            font-size: 0.8rem;
-            color: #777;
-            margin-top: 5px;
-            margin-bottom: 5px;
-        }
+        #openseadragon-viewer { background-color: #000; }
+        model-viewer { background-color: #222; }
 
     </style>
 </head>
 <body>
 
-    <div class="mode-switch-container">
-        <button class="mode-btn active" onclick="switchMode('2d')">Documents</button>
-        <button class="mode-btn" onclick="switchMode('3d')">3D Artifacts</button>
+    <div class="toggle-container">
+        <label class="switch">
+            <input type="checkbox" id="mode-checkbox" onchange="toggleMode()">
+            <span class="slider round"></span>
+        </label>
     </div>
 
     <div id="section-2d" class="view-section active-view">
         <div id="openseadragon-viewer"></div>
-
-        <div class="info-panel">
-            <h1>Shoebox Notes</h1>
-            <p>Pinch to zoom into the handwriting details.</p>
-            
-            <div class="controls-row">
-                <button class="btn btn-secondary" id="prev-btn">← Prev</button>
-                <button class="btn btn-secondary" id="next-btn">Next →</button>
-            </div>
-            <div id="page-counter">Document 1 of 2</div>
-
-            <div class="controls-row">
-                <button class="btn" id="home-btn">Reset</button>
-                <button class="btn" id="zoom-out-btn">-</button>
-                <button class="btn" id="zoom-in-btn">+</button>
-            </div>
-        </div>
     </div>
 
     <div id="section-3d" class="view-section">
@@ -181,36 +200,39 @@
             touch-action="pan-y"
             auto-rotate>
         </model-viewer>
+    </div>
 
-        <div class="info-panel">
-            <h1>3D Artifacts</h1>
-            <p>Swipe to rotate. Pinch to zoom.</p>
-            <p style="font-size: 0.85rem; color:#777;">
-                (Demo Model: Actual PLY scan files will be processed and loaded here in the final version.)
-            </p>
-        </div>
+    <div class="bottom-nav" id="controls-bar">
+        <button class="nav-btn" id="prev-btn">Prev</button>
+        <div class="divider"></div>
+        <button class="nav-btn reset" id="home-btn">Reset</button>
+        <div class="divider"></div>
+        <button class="nav-btn" id="next-btn">Next</button>
     </div>
 
     <script>
-        // --- 1. MODE SWITCHING LOGIC ---
-        function switchMode(mode) {
-            // Remove 'active' class from everything
-            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active-view'));
-            document.querySelectorAll('.mode-btn').forEach(el => el.classList.remove('active'));
+        // --- 1. TOGGLE LOGIC ---
+        function toggleMode() {
+            const isChecked = document.getElementById('mode-checkbox').checked;
+            const view2d = document.getElementById('section-2d');
+            const view3d = document.getElementById('section-3d');
+            const controls = document.getElementById('controls-bar');
 
-            if (mode === '2d') {
-                document.getElementById('section-2d').classList.add('active-view');
-                document.querySelector('button[onclick="switchMode(\'2d\')"]').classList.add('active');
-                // Refresh 2D viewer just in case
-                if(viewer) viewer.viewport.applyConstraints();
+            if (isChecked) {
+                // 3D Mode
+                view2d.classList.remove('active-view');
+                view3d.classList.add('active-view');
+                controls.classList.add('hidden'); // Hide controls in 3D
             } else {
-                document.getElementById('section-3d').classList.add('active-view');
-                document.querySelector('button[onclick="switchMode(\'3d\')"]').classList.add('active');
+                // 2D Mode
+                view3d.classList.remove('active-view');
+                view2d.classList.add('active-view');
+                controls.classList.remove('hidden'); // Show controls in 2D
+                if(viewer) viewer.viewport.applyConstraints(); // Refresh layout
             }
         }
 
-        // --- 2. OPENSEADRAGON (2D) CONFIG ---
-        // UPDATE: Pointing to 'media/' folder now
+        // --- 2. OPENSEADRAGON CONFIG ---
         var myImages = [
             "media/FSUDirac_12_1c_0021.jpg",
             "media/FSUDirac_12_1b_0012.jpg"
@@ -223,41 +245,33 @@
             prefixUrl: "https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/images/",
             gestureSettingsTouch: { pinchToZoom: true, flickEnabled: true },
             showNavigationControl: false,
-            showNavigator: true,
-            navigatorPosition: "TOP_RIGHT",
-            tileSources: {
-                type: 'image',
-                url:  myImages[0]
-            }
+            showNavigator: false, // Turned off navigator for cleaner look?
+            tileSources: { type: 'image', url: myImages[0] }
         });
 
-        // --- 2D Navigation Logic ---
+        // --- Navigation Logic ---
         function loadCurrentImage() {
             viewer.open({ type: 'image', url: myImages[currentIndex] });
-            document.getElementById('page-counter').innerText = 
-                "Document " + (currentIndex + 1) + " of " + myImages.length;
         }
 
         document.getElementById('next-btn').addEventListener('click', function() {
             if (currentIndex < myImages.length - 1) {
                 currentIndex++;
-                loadCurrentImage();
-            } else { currentIndex = 0; loadCurrentImage(); }
+            } else { 
+                currentIndex = 0; // Loop to start
+            }
+            loadCurrentImage();
         });
 
         document.getElementById('prev-btn').addEventListener('click', function() {
             if (currentIndex > 0) {
                 currentIndex--;
-                loadCurrentImage();
-            } else { currentIndex = myImages.length - 1; loadCurrentImage(); }
+            } else { 
+                currentIndex = myImages.length - 1; // Loop to end
+            }
+            loadCurrentImage();
         });
 
-        document.getElementById('zoom-in-btn').addEventListener('click', function() {
-            viewer.viewport.zoomBy(1.2); viewer.viewport.applyConstraints();
-        });
-        document.getElementById('zoom-out-btn').addEventListener('click', function() {
-            viewer.viewport.zoomBy(0.8); viewer.viewport.applyConstraints();
-        });
         document.getElementById('home-btn').addEventListener('click', function() {
             viewer.viewport.goHome();
         });
