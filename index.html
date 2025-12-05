@@ -3,8 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Dirac Shoebox Collection - Image Viewer</title>
+    <title>FSU Dirac Repository - Interactive Demo</title>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/openseadragon.min.js"></script>
+    
+    <script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/3.3.0/model-viewer.min.js"></script>
+
     <style>
         body, html {
             margin: 0;
@@ -16,113 +20,204 @@
             overflow: hidden;
         }
 
-        #openseadragon-viewer {
-            width: 100%;
-            height: 100vh;
-            background-color: #000;
+        /* --- MODE TOGGLE SWITCH (Top Center) --- */
+        .mode-switch-container {
+            position: absolute;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            background: rgba(255,255,255,0.9);
+            padding: 5px;
+            border-radius: 30px;
+            display: flex;
+            gap: 5px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
 
-        /* Info Panel / Sig Window */
+        .mode-btn {
+            border: none;
+            background: transparent;
+            padding: 10px 25px;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            color: #555;
+            transition: all 0.2s ease;
+        }
+
+        .mode-btn.active {
+            background-color: #782F40; /* FSU Garnet */
+            color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        /* --- VIEW CONTAINERS --- */
+        .view-section {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: none; /* Hidden by default */
+        }
+
+        /* Show the active section */
+        .view-section.active-view {
+            display: block;
+        }
+
+        /* 2D Viewer Styling */
+        #openseadragon-viewer {
+            width: 100%;
+            height: 100%;
+            background-color: #111;
+        }
+
+        /* 3D Viewer Styling */
+        model-viewer {
+            width: 100%;
+            height: 100%;
+            background-color: #222;
+            --poster-color: transparent;
+        }
+
+        /* --- INFO PANELS --- */
         .info-panel {
             position: absolute;
-            bottom: 40px;
-            left: 40px;
-            width: 380px; /* Slightly wider for new buttons */
+            bottom: 30px;
+            left: 30px;
+            width: 360px; 
             background: rgba(255, 255, 255, 0.95);
-            padding: 25px;
+            padding: 20px;
             border-radius: 8px;
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            z-index: 100;
+            pointer-events: auto;
         }
 
         .info-panel h1 {
             margin-top: 0;
-            font-size: 1.4rem;
+            font-size: 1.3rem;
             color: #333;
             border-bottom: 2px solid #782F40;
-            padding-bottom: 10px;
-            margin-bottom: 15px;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
         }
 
         .info-panel p {
-            font-size: 1rem;
-            line-height: 1.5;
+            font-size: 0.95rem;
+            line-height: 1.4;
             color: #555;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
         }
 
-        /* Button Layout */
+        /* Buttons */
         .controls-row {
             display: flex;
             justify-content: space-between;
             margin-top: 10px;
-            gap: 5px;
+            gap: 8px;
         }
 
         .btn {
             background-color: #782F40;
             color: white;
             border: none;
-            padding: 10px 15px;
-            border-radius: 5px;
+            padding: 10px;
+            border-radius: 4px;
             font-size: 0.9rem;
             cursor: pointer;
-            flex-grow: 1; /* Make buttons fill space */
+            flex-grow: 1;
         }
 
-        .btn:active {
-            background-color: #5a2330;
-        }
-
-        .btn-secondary {
-            background-color: #555;
-        }
+        .btn-secondary { background-color: #555; }
+        .btn:active { opacity: 0.8; }
         
         #page-counter {
             text-align: center;
             font-size: 0.8rem;
             color: #777;
             margin-top: 5px;
+            margin-bottom: 5px;
         }
 
     </style>
 </head>
 <body>
 
-    <div id="openseadragon-viewer"></div>
+    <div class="mode-switch-container">
+        <button class="mode-btn active" onclick="switchMode('2d')">Documents</button>
+        <button class="mode-btn" onclick="switchMode('3d')">3D Artifacts</button>
+    </div>
 
-    <div class="info-panel">
-        <h1>Dirac Shoebox Notes</h1>
-        <p>
-            Explore the handwritten notes of Paul A.M. Dirac. 
-            Pinch to zoom in on the details.
-        </p>
-        
-        <div class="controls-row">
-            <button class="btn btn-secondary" id="prev-btn">← Prev</button>
-            <button class="btn btn-secondary" id="next-btn">Next →</button>
+    <div id="section-2d" class="view-section active-view">
+        <div id="openseadragon-viewer"></div>
+
+        <div class="info-panel">
+            <h1>Shoebox Notes</h1>
+            <p>Pinch to zoom into the handwriting details.</p>
+            
+            <div class="controls-row">
+                <button class="btn btn-secondary" id="prev-btn">← Prev</button>
+                <button class="btn btn-secondary" id="next-btn">Next →</button>
+            </div>
+            <div id="page-counter">Document 1 of 2</div>
+
+            <div class="controls-row">
+                <button class="btn" id="home-btn">Reset</button>
+                <button class="btn" id="zoom-out-btn">-</button>
+                <button class="btn" id="zoom-in-btn">+</button>
+            </div>
         </div>
-        
-        <div id="page-counter">Document 1 of 2</div>
+    </div>
 
-        <div class="controls-row">
-            <button class="btn" id="home-btn">Reset</button>
-            <button class="btn" id="zoom-out-btn">-</button>
-            <button class="btn" id="zoom-in-btn">+</button>
+    <div id="section-3d" class="view-section">
+        <model-viewer 
+            src="https://modelviewer.dev/shared-assets/models/Astronaut.glb" 
+            poster="https://modelviewer.dev/shared-assets/models/Astronaut.webp" 
+            shadow-intensity="1" 
+            camera-controls 
+            touch-action="pan-y"
+            auto-rotate>
+        </model-viewer>
+
+        <div class="info-panel">
+            <h1>3D Artifacts</h1>
+            <p>Swipe to rotate. Pinch to zoom.</p>
+            <p style="font-size: 0.85rem; color:#777;">
+                (Demo Model: Actual PLY scan files will be processed and loaded here in the final version.)
+            </p>
         </div>
     </div>
 
     <script>
-        // --- CONFIGURATION ---
-        // Your images in the /images folder
+        // --- 1. MODE SWITCHING LOGIC ---
+        function switchMode(mode) {
+            // Remove 'active' class from everything
+            document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active-view'));
+            document.querySelectorAll('.mode-btn').forEach(el => el.classList.remove('active'));
+
+            if (mode === '2d') {
+                document.getElementById('section-2d').classList.add('active-view');
+                document.querySelector('button[onclick="switchMode(\'2d\')"]').classList.add('active');
+                // Refresh 2D viewer just in case
+                if(viewer) viewer.viewport.applyConstraints();
+            } else {
+                document.getElementById('section-3d').classList.add('active-view');
+                document.querySelector('button[onclick="switchMode(\'3d\')"]').classList.add('active');
+            }
+        }
+
+        // --- 2. OPENSEADRAGON (2D) CONFIG ---
+        // UPDATE: Pointing to 'media/' folder now
         var myImages = [
-            "images/FSUDirac_12_1c_0021.jpg",
-            "images/FSUDirac_12_1b_0012.jpg"
+            "media/FSUDirac_12_1c_0021.jpg",
+            "media/FSUDirac_12_1b_0012.jpg"
         ];
         
         var currentIndex = 0;
 
-        // Initialize Viewer
         var viewer = OpenSeadragon({
             id: "openseadragon-viewer",
             prefixUrl: "https://cdnjs.cloudflare.com/ajax/libs/openseadragon/4.1.0/images/",
@@ -130,21 +225,15 @@
             showNavigationControl: false,
             showNavigator: true,
             navigatorPosition: "TOP_RIGHT",
-            
-            // Start with the first image
             tileSources: {
                 type: 'image',
                 url:  myImages[0]
             }
         });
 
-        // --- NAVIGATION LOGIC ---
+        // --- 2D Navigation Logic ---
         function loadCurrentImage() {
-            viewer.open({
-                type: 'image',
-                url: myImages[currentIndex]
-            });
-            // Update counter text
+            viewer.open({ type: 'image', url: myImages[currentIndex] });
             document.getElementById('page-counter').innerText = 
                 "Document " + (currentIndex + 1) + " of " + myImages.length;
         }
@@ -153,38 +242,26 @@
             if (currentIndex < myImages.length - 1) {
                 currentIndex++;
                 loadCurrentImage();
-            } else {
-                // Optional: Loop back to start
-                currentIndex = 0; 
-                loadCurrentImage();
-            }
+            } else { currentIndex = 0; loadCurrentImage(); }
         });
 
         document.getElementById('prev-btn').addEventListener('click', function() {
             if (currentIndex > 0) {
                 currentIndex--;
                 loadCurrentImage();
-            } else {
-                // Optional: Loop to end
-                currentIndex = myImages.length - 1; 
-                loadCurrentImage();
-            }
+            } else { currentIndex = myImages.length - 1; loadCurrentImage(); }
         });
 
-        // --- ZOOM LOGIC ---
         document.getElementById('zoom-in-btn').addEventListener('click', function() {
-            viewer.viewport.zoomBy(1.2);
-            viewer.viewport.applyConstraints();
+            viewer.viewport.zoomBy(1.2); viewer.viewport.applyConstraints();
         });
-
         document.getElementById('zoom-out-btn').addEventListener('click', function() {
-            viewer.viewport.zoomBy(0.8);
-            viewer.viewport.applyConstraints();
+            viewer.viewport.zoomBy(0.8); viewer.viewport.applyConstraints();
         });
-
         document.getElementById('home-btn').addEventListener('click', function() {
             viewer.viewport.goHome();
         });
+
     </script>
 
 </body>
